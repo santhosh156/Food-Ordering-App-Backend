@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "restaurant")
@@ -33,7 +36,7 @@ public class RestaurantEntity implements Serializable {
     @Column(name = "UUID")
     @NotNull
     @Size(max = 200)
-    private String uuid;
+    private UUID uuid;
 
     @Column(name = "RESTAURANT_NAME")
     @NotNull
@@ -57,7 +60,8 @@ public class RestaurantEntity implements Serializable {
     @NotNull
     private Integer avgPriceForTwo;
 
-    @OneToOne
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ADDRESS_ID")
     private AddressEntity address;
 
@@ -69,11 +73,11 @@ public class RestaurantEntity implements Serializable {
         this.id = id;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 

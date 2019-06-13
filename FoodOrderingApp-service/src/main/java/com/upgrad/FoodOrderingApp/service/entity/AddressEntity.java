@@ -13,10 +13,7 @@ import java.io.Serializable;
 @Table(name = "address")
 @NamedQueries(
         {
-                //@NamedQuery(name = "customerByUuid", query = "select c from CustomerEntity c where c.uuid = :uuid"),
-                //@NamedQuery(name = "customerByContactNumber", query = "select c from CustomerEntity c where c.contactNumber = :contactNumber"),
-                //@NamedQuery(name = "customerByEmail", query = "select c from CustomerEntity c where c.email =:email"),
-                //@NamedQuery(name="deleteUser",query = "delete from UserEntity u where u.uuid=:uuid")
+                @NamedQuery(name = "addressById", query = "select a from AddressEntity a where a.id = :id"),
         }
 )
 
