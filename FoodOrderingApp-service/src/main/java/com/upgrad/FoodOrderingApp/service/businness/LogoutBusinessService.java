@@ -26,7 +26,7 @@ public class LogoutBusinessService {
         } else if (customerAuthTokenEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
         } else if (now.isAfter(customerAuthTokenEntity.getExpiresAt()) ) {
-            throw new AuthorizationFailedException("ATHR-002", "Your session is expired. Log in again to access this endpoint.");
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
         customerAuthTokenEntity.setLogoutAt(now);

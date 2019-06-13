@@ -1,9 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.controller;
 
-import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
-import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
-import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
-import com.upgrad.FoodOrderingApp.api.model.SignupCustomerResponse;
+import com.upgrad.FoodOrderingApp.api.model.*;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerAdminBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.LoginAuthenticationService;
 import com.upgrad.FoodOrderingApp.service.businness.LogoutBusinessService;
 import com.upgrad.FoodOrderingApp.service.businness.SignupBusinessService;
@@ -12,15 +10,13 @@ import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
+import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -37,6 +33,9 @@ public class CustomerController {
 
     @Autowired
     private LogoutBusinessService logoutBusinessService;
+
+    @Autowired
+    private CustomerAdminBusinessService customerAdminBusinessService;
 
     @RequestMapping(method=RequestMethod.POST, path="/customer/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
@@ -89,7 +88,8 @@ public class CustomerController {
     }
 
     @RequestMapping(method= RequestMethod.POST, path="/customer/logout", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<LogoutResponse>signout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<LogoutResponse>logout(@RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException {
 
         String[] bearerToken = authorization.split( "Bearer ");
         final CustomerAuthTokenEntity customerAuthTokenEntity = logoutBusinessService.logout(bearerToken[1]);
@@ -99,5 +99,31 @@ public class CustomerController {
 
         return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
 
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/customer",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdateCustomerResponse> updateCustomer(final UpdateCustomerRequest customerUpdateRequest,
+                                                               @RequestHeader("authorization") final String authorizaton)
+            throws AuthorizationFailedException, UpdateCustomerException {
+
+        //Creating a new instance of the CustomerEntity
+        final CustomerEntity updatedCustomerEntity = new CustomerEntity();
+
+        // UpdatedCustomerEntity with the new first and last name from the customerUpdateRequest
+        updatedCustomerEntity.setFirstName(customerUpdateRequest.getFirstName());
+        updatedCustomerEntity.setLastName(customerUpdateRequest.getLastName());
+
+        // Get the bearerToken
+        String[] bearerToken = authorizaton.split("Bearer ");
+
+        // Call the CustomerAdminBusinessService to update the customer
+        CustomerEntity customerEntity = customerAdminBusinessService.updateCustomer(updatedCustomerEntity, bearerToken[1]);
+
+        // Attach the details to the updateCustomerResponse
+        UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse().id(customerEntity.getUuid())
+                .firstName(customerEntity.getFirstName()).lastName(customerEntity.getLastName())
+                .status("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
     }
 }
