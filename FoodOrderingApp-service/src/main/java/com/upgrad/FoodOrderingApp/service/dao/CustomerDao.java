@@ -1,5 +1,6 @@
 package com.upgrad.FoodOrderingApp.service.dao;
 
+import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import org.springframework.stereotype.Repository;
 
@@ -40,6 +41,35 @@ public class CustomerDao {
         try {
             return entityManager.createNamedQuery("customerByContactNumber", CustomerEntity.class).setParameter("contactNumber", customerContactNumber)
                     .getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
+    }
+
+    ////////////////////////created for customer-login/////////////////////
+    public CustomerAuthTokenEntity createAuthToken(final CustomerAuthTokenEntity customerAuthTokenEntity) {
+        entityManager.persist(customerAuthTokenEntity);
+        return customerAuthTokenEntity;
+    }
+
+    public void updateCustomer(final CustomerEntity updatedCustomerEntity) {
+        entityManager.merge(updatedCustomerEntity);
+    }
+
+    public void updateCustomerAuth(final CustomerAuthTokenEntity customerAuthTokenEntity) {
+        entityManager.merge(customerAuthTokenEntity);
+    }
+
+    public CustomerEntity deleteCustomer(final CustomerEntity customerEntity){
+        entityManager.remove(customerEntity);
+        return customerEntity;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    public CustomerAuthTokenEntity getCustomerAuthToken(final String accessToken) {
+        try {
+            return entityManager.createNamedQuery("customerAuthTokenByAccessToken", CustomerAuthTokenEntity.class)
+                    .setParameter("accessToken", accessToken).getSingleResult();
         } catch(NoResultException nre) {
             return null;
         }
