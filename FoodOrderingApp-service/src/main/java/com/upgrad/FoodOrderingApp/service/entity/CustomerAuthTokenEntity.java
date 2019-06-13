@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -17,7 +18,7 @@ import java.time.ZonedDateTime;
 })
 
 
-public class CustomerAuthTokenEntity {
+public class CustomerAuthTokenEntity  implements Serializable {
 
     @Id
     @Column(name = "ID")
