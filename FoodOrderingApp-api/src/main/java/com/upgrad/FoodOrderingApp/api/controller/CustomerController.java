@@ -126,4 +126,25 @@ public class CustomerController {
 
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
     }
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/customer/password",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdatePasswordResponse> updateCustomerPassword(final UpdatePasswordRequest customerUpdatePasswordRequest,
+                                                                 @RequestHeader("authorization") final String authorizaton)
+            throws AuthorizationFailedException, UpdateCustomerException {
+
+        String oldPassword = customerUpdatePasswordRequest.getOldPassword();
+        String newPassword = customerUpdatePasswordRequest.getNewPassword();
+
+        // Get the bearerToken
+        String[] bearerToken = authorizaton.split("Bearer ");
+
+        // Call the CustomerAdminBusinessService to update the customer
+        CustomerEntity customerEntity = customerAdminBusinessService.updateCustomerPassword(oldPassword, newPassword, bearerToken[1]);
+
+        // Attach the details to the updateCustomerResponse
+        UpdatePasswordResponse updatePasswordResponse = new UpdatePasswordResponse().id(customerEntity.getUuid())
+                .status("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<UpdatePasswordResponse>(updatePasswordResponse, HttpStatus.OK);
+    }
 }
