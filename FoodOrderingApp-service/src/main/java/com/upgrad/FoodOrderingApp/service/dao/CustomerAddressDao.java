@@ -24,7 +24,12 @@ public class CustomerAddressDao {
                     .setParameter("uuid", uuid).getSingleResult();
 
             List<CustomerAddressEntity> customerAddressEntities = entityManager.createQuery("SELECT ca FROM CustomerAddressEntity ca WHERE ca.customerId = :id", CustomerAddressEntity.class)
-                    .setParameter("id", customerEntity.getId()).getResultList();
+                    .setParameter("id", (long) customerEntity.getId()).getResultList();
+
+            if (customerAddressEntities.size() == 0) {
+                return null;
+            }
+
             List<Long> ids = new ArrayList<>();
 
             for (CustomerAddressEntity cae : customerAddressEntities) {
@@ -37,7 +42,7 @@ public class CustomerAddressDao {
 
             return addressEntitiesList;
         } catch (NoResultException nre) {
-            return new ArrayList<>();
+            return null;
         }
     }
 }

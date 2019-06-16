@@ -1,12 +1,14 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @NamedQueries(
         {
                 @NamedQuery(name = "stateByUuid", query = "select s from StateEntity s where s.uuid = :uuid"),
                 @NamedQuery(name = "stateById", query = "select s from StateEntity s where s.id = :id"),
+                @NamedQuery(name = "allStates", query = "select s from StateEntity s"),
         }
 )
 @Table(name = "state")
@@ -17,12 +19,12 @@ public class StateEntity {
     private Long id;
 
     @Column(name = "uuid")
-    private String uuid;
+    private UUID uuid;
 
     @Column(name = "state_name")
     private String stateName;
 
-    public StateEntity(String uuid, String stateName) {
+    public StateEntity(UUID uuid, String stateName) {
         this.uuid = uuid;
         this.stateName = stateName;
     }
@@ -30,11 +32,11 @@ public class StateEntity {
     public StateEntity() {
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AddressService {
@@ -66,6 +67,21 @@ public class AddressService {
         return addressEntity;
     }
 
+    @Transactional
+    public void deleteAddress(UUID addressId, String bearerToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+        validateAccessToken(bearerToken);
+
+        if (addressId == null) {
+            throw new AddressNotFoundException("ANF-005", "Address id can not be empty.");
+        }
+
+        AddressEntity address = addressDao.deleteAddressByUuid(addressId.toString());
+
+        if (address == null) {
+            throw new AddressNotFoundException("ANF-003", "No address by this id.");
+        }
+    }
+
     public List<AddressEntity> getAllAddress(String bearerToken) throws AuthorizationFailedException {
 
         validateAccessToken(bearerToken);
@@ -74,6 +90,11 @@ public class AddressService {
         CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(bearerToken);
 
         return customerAddressDao.getAddressForCustomerByUuid(customerAuthTokenEntity.getCustomer().getUuid());
+    }
+
+    public List<StateEntity> getAllStates(String bearerToken) throws AuthorizationFailedException {
+        validateAccessToken(bearerToken);
+        return stateDao.getAllStates();
     }
 
     private void validateAccessToken(String bearerToken) throws AuthorizationFailedException {
