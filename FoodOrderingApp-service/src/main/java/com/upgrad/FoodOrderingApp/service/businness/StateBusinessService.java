@@ -14,7 +14,7 @@ public class StateBusinessService {
     private StateDao stateDao;
 
     @Transactional
-    public StateEntity getStateById (final Integer stateId) {
+    public StateEntity getStateById (final Long stateId) {
         return stateDao.getStateById(stateId);
     }
 }
