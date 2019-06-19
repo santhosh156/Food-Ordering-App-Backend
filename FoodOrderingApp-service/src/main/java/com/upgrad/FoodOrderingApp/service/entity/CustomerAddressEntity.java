@@ -3,6 +3,8 @@ package com.upgrad.FoodOrderingApp.service.entity;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,7 +14,8 @@ import java.io.Serializable;
 @Table(name = "customer_address")
 @NamedQueries(
         {
-                @NamedQuery(name = "customerAddressByCustomerId", query = "select c from CustomerAddressEntity c where c.customerId = :id"),
+                @NamedQuery(name = "customerAddressByCustomerId", query = "select c from CustomerAddressEntity c where c.customer = :id"),
+                @NamedQuery(name = "customerAddressesListByCustomerId", query = "select c from CustomerAddressEntity c where c.customer = :customer order by c.address desc")
         }
 )
 public class CustomerAddressEntity implements Serializable {
@@ -22,13 +25,15 @@ public class CustomerAddressEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_id")
-    @NotNull
-    private Long customerId;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "CUSTOMER_ID")
+    private CustomerEntity customer;
 
-    @Column(name = "address_id")
-    @NotNull
-    private Long addressId;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ADDRESS_ID")
+    private AddressEntity address;
 
     public Long getId() {
         return id;
@@ -38,20 +43,20 @@ public class CustomerAddressEntity implements Serializable {
         this.id = id;
     }
 
-    public Long getCustomerId() {
-        return customerId;
+    public CustomerEntity getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
     }
 
-    public Long getAddressId() {
-        return addressId;
+    public AddressEntity getAddress() {
+        return address;
     }
 
-    public void setAddressId(Long addressId) {
-        this.addressId = addressId;
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
 
     @Override

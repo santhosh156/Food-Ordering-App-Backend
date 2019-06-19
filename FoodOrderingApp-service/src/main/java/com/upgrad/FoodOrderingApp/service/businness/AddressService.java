@@ -4,14 +4,13 @@ import com.upgrad.FoodOrderingApp.service.dao.AddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 import com.upgrad.FoodOrderingApp.service.dao.StateDao;
-import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
-import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
@@ -33,8 +32,16 @@ public class AddressService {
     @Autowired
     private StateDao stateDao;
 
-    public StateEntity getStateByUUID(String uuid) {
-        return stateDao.getStateByUuid(uuid);
+    public StateEntity getStateByUUID(String stateUuid) throws SaveAddressException, AddressNotFoundException{
+        StateEntity stateEntity = stateDao.getStateByUuid(stateUuid);
+        if(stateUuid.isEmpty()){
+            throw new SaveAddressException("SAR-001", "No field can be empty");
+        }
+        else if(stateEntity == null){
+            throw new AddressNotFoundException("ANF-002", "No state by this id");
+        } else {
+            return stateEntity;
+        }
     }
 
     public StateEntity getStateById(Long stateId) {
@@ -45,8 +52,10 @@ public class AddressService {
     public AddressEntity saveAddress(AddressEntity addressEntity, String bearerToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         validateAccessToken(bearerToken);
 
+        getStateByUUID(addressEntity.getState().getUuid());
+
         if (addressEntity.getCity() == null || addressEntity.getCity().isEmpty() ||
-                addressEntity.getStateId() == null ||
+                //addressEntity.getState() == null ||
                 addressEntity.getFlatBuildingNumber() == null || addressEntity.getFlatBuildingNumber().isEmpty() ||
                 addressEntity.getLocality() == null || addressEntity.getLocality().isEmpty() ||
                 addressEntity.getPincode() == null || addressEntity.getPincode().isEmpty() ||
@@ -54,17 +63,34 @@ public class AddressService {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
         }
 
-        if (!addressEntity.getPincode().matches("^[1-9][0-9]{5}$")) {
-            throw new SaveAddressException("SAR-002", "Invalid pincode.");
-        }
+        /*if (stateDao.getStateByUuid(addressEntity.getState().getUuid()) == null) {
+            throw new AddressNotFoundException("ANF-002", "No state by this id");
+        }*/
 
-        if (stateDao.getStateById(addressEntity.getStateId()) == null) {
-            throw new AddressNotFoundException("ANF-002", "No state by this id.");
+        if (!addressEntity.getPincode().matches("^[1-9][0-9]{5}$")) {
+            throw new SaveAddressException("SAR-002", "Invalid pincode");
         }
 
         addressEntity = addressDao.createAddress(addressEntity);
 
+
+        //get the customerAuthToken details from customerDao
+        CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(bearerToken);
+
+        // Save the customer address
+        final CustomerEntity customerEntity = customerDao.getCustomerByUuid(customerAuthTokenEntity.getUuid());
+        final CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
+
+        customerAddressEntity.setAddress(addressEntity);
+        customerAddressEntity.setCustomer(customerEntity);
+        createCustomerAddress(customerAddressEntity);
+
         return addressEntity;
+    }
+
+    @Transactional
+    public CustomerAddressEntity createCustomerAddress(final CustomerAddressEntity customerAddressEntity) {
+        return customerAddressDao.createCustomerAddress(customerAddressEntity);
     }
 
     @Transactional

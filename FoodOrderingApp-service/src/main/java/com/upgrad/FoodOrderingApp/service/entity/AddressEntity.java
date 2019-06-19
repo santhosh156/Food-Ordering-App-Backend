@@ -1,45 +1,63 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "address")
 @NamedQueries(
         {
                 @NamedQuery(name = "addressByUuid", query = "select a from AddressEntity a where a.uuid = :uuid"),
+                @NamedQuery(name = "savedAddresses", query = "select a from AddressEntity a"),
+                @NamedQuery(name = "addressById", query = "select a from AddressEntity a where a.id = :id"),
         }
 )
-public class AddressEntity {
+public class AddressEntity implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ID")
     private Long id;
 
     @Column(name = "uuid")
+    @Size(max = 200)
     private String uuid;
 
-    @Column(name = "flat_buil_number")
+    @Column(name = "FLAT_BUIL_NUMBER")
+    @Size(max = 255)
     private String flatBuildingNumber;
 
-    @Column(name = "locality")
+    @Column(name = "LOCALITY")
+    @Size(max = 255)
     private String locality;
 
-    @Column(name = "city")
+    @Column(name = "CITY")
+    @Size(max = 30)
     private String city;
 
-    @Column(name = "pincode")
+    @Column(name = "PINCODE")
+    @Size(max = 30)
     private String pincode;
 
-    @JoinColumn(name = "id")
-    @Column(name = "state_id")
-    private Long stateId;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "STATE_ID")
     private StateEntity state;
 
     @Column(name = "active")
     private Long active;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getUuid() {
         return uuid;
@@ -79,14 +97,6 @@ public class AddressEntity {
 
     public void setPincode(String pincode) {
         this.pincode = pincode;
-    }
-
-    public Long getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(Long stateId) {
-        this.stateId = stateId;
     }
 
     public StateEntity getState() {
