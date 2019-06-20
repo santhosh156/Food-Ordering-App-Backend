@@ -24,6 +24,11 @@ public class CustomerAdminBusinessService {
     private PasswordCryptographyProvider cryptographyProvider;
 
     @Transactional
+    public CustomerEntity getCustomerById(final Integer customerId) {
+        return customerDao.getCustomerById(customerId);
+    }
+
+    @Transactional
     public CustomerEntity signup(CustomerEntity customerEntity) throws SignUpRestrictedException {
 
         // Regular expression for email format

@@ -19,6 +19,16 @@ public class CustomerDao {
         return customerEntity;
     }
 
+    public CustomerEntity getCustomerById(final Integer customerId) {
+        try {
+            return entityManager.createNamedQuery("customerById", CustomerEntity.class).setParameter("id", customerId)
+                    .getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
+    }
+
+
     public CustomerEntity getCustomerByUuid(final String uuid) {
         try {
             return entityManager.createNamedQuery("customerByUuid", CustomerEntity.class).setParameter("uuid", uuid)

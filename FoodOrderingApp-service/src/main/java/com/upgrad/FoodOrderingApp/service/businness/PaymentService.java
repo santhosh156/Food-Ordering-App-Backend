@@ -18,4 +18,9 @@ public class PaymentService {
     public List<PaymentEntity> getAllPaymentMethods() {
         return paymentDao.getAllPaymentMethods();
     }
+
+    @Transactional
+    public PaymentEntity getPaymentById(Long paymentId) {
+        return paymentDao.getPaymentForId(paymentId);
+    }
 }

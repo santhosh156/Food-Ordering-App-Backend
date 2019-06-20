@@ -4,13 +4,15 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Entity
 @Table(name = "coupon")
 @NamedQueries(
         {
                 @NamedQuery(name = "couponByUuid", query = "select c from CouponEntity c where c.uuid=:uuid"),
-                @NamedQuery(name = "couponById", query = "select c from CouponEntity c where c.id=:id")
+                @NamedQuery(name = "couponById", query = "select c from CouponEntity c where c.id=:id"),
+                @NamedQuery(name = "couponByName", query = "select c from CouponEntity c where c.couponName=:couponName")
         }
 )
 
@@ -23,7 +25,7 @@ public class CouponEntity implements Serializable {
 
     @Column(name = "UUID")
     @Size(max = 200)
-    private String uuid;
+    private UUID uuid;
 
     @Column(name = "COUPON_NAME")
     private String couponName;
@@ -40,11 +42,11 @@ public class CouponEntity implements Serializable {
         this.id = id;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
