@@ -14,7 +14,6 @@ import java.io.Serializable;
         }
 )
 
-
 public class CouponEntity implements Serializable {
 
     @Id
