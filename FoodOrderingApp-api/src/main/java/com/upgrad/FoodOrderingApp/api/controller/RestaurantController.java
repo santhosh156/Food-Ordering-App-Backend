@@ -324,7 +324,7 @@ public class RestaurantController {
 
     @RequestMapping(method = RequestMethod.PUT, path = "/restaurant/{restaurant_id}",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updateCustomerRating(@RequestHeader("authorization") final String authorization, @RequestParam Double customerRating, @PathVariable String restaurant_id )
-            throws AuthorizationFailedException, InvalidRatingException {
+            throws AuthorizationFailedException, InvalidRatingException, RestaurantNotFoundException {
 
         // Get the bearerToken
         String[] bearerToken = authorization.split("Bearer ");
@@ -333,8 +333,8 @@ public class RestaurantController {
         RestaurantEntity restaurantEntity = restaurantBusinessService.updateCustomerRating(customerRating, restaurant_id, bearerToken[1]);
 
         // Attach the details to the updateResponse
-        RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse().setId(UUID.fromString(restaurantEntity.getUuid()))
-                .status("RESTAURANT RATING UPDATED SUCCESSFULLY");
+        RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse()
+                .id(UUID.fromString(restaurantEntity.getUuid())).status("RESTAURANT RATING UPDATED SUCCESSFULLY");
 
         return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
