@@ -15,7 +15,7 @@ public class StateBusinessService {
 
     @Transactional
     // A Method which takes the stateId as parameter for  getStateById endpoint
-    public StateEntity getStateById (final Integer stateId) {
+    public StateEntity getStateById (final Long stateId) {
 
         return stateDao.getStateById(stateId);
     }

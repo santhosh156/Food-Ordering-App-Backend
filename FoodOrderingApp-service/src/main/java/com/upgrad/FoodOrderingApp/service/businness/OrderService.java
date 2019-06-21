@@ -34,12 +34,8 @@ public class OrderService {
     @Transactional
     public CouponEntity getCouponByName(String couponName, final String authorizationToken) throws AuthorizationFailedException {
 
-        // Gets the customerAuthToken details from customerDao
-        CustomerAuthTokenEntity customerAuthTokenEntity = customerAdminBusinessService.getCustomerAuthToken(authorizationToken);
-
         // Validates the access token retrieved from database
-        customerAdminBusinessService.validateAccessToken(customerAuthTokenEntity);
-
+        customerAdminBusinessService.validateAccessToken(authorizationToken);
         return orderDao.getCouponByName(couponName);
     }
 
@@ -50,7 +46,7 @@ public class OrderService {
         CustomerAuthTokenEntity customerAuthTokenEntity = customerAdminBusinessService.getCustomerAuthToken(authorizationToken);
 
         // Validates the access token retrieved from database
-        customerAdminBusinessService.validateAccessToken(customerAuthTokenEntity);
+        customerAdminBusinessService.validateAccessToken(authorizationToken);
 
         return orderDao.getCustomerOrders(customerAuthTokenEntity.getId());
     }
@@ -59,11 +55,8 @@ public class OrderService {
     public OrdersEntity saveOrder(OrdersEntity ordersEntity, final String authorizationToken)
             throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException {
 
-        //get the customerAuthToken details from customerDao
-        CustomerAuthTokenEntity customerAuthTokenEntity = customerAdminBusinessService.getCustomerAuthToken(authorizationToken);
-
         // Validates the provided access token
-        customerAdminBusinessService.validateAccessToken(customerAuthTokenEntity);
+        customerAdminBusinessService.validateAccessToken(authorizationToken);
 
         CouponEntity couponEntity = couponService.getCouponByUuid(ordersEntity.getCoupon().getUuid());
 

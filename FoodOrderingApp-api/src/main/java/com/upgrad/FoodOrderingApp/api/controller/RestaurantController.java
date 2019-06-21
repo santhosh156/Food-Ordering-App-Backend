@@ -20,7 +20,7 @@ public class RestaurantController {
     private RestaurantBusinessService restaurantBusinessService;
 
     @Autowired
-    private AddressBusinessService addressBusinessService;
+    private AddressService addressService;
 
     @Autowired
     private StateBusinessService stateBusinessService;
@@ -52,7 +52,7 @@ public class RestaurantController {
             detail.setNumberCustomersRated(n.getNumCustomersRated());
 
             // Getting address of restaurant from address entity
-            AddressEntity addressEntity = addressBusinessService.getAddressById(n.getAddress().getId());
+            AddressEntity addressEntity = addressService.getAddressById(n.getAddress().getId());
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress();
 
             responseAddress.setId(UUID.fromString(addressEntity.getUuid()));
@@ -121,7 +121,7 @@ public class RestaurantController {
             detail.setNumberCustomersRated(n.getNumCustomersRated());
 
             // Getting address of restaurant from address entity
-            AddressEntity addressEntity = addressBusinessService.getAddressById(n.getAddress().getId());
+            AddressEntity addressEntity = addressService.getAddressById(n.getAddress().getId());
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress();
 
             responseAddress.setId(UUID.fromString(addressEntity.getUuid()));
@@ -199,7 +199,7 @@ public class RestaurantController {
             detail.setNumberCustomersRated(n.getNumCustomersRated());
 
             // Getting address of restaurant from address entity
-            AddressEntity addressEntity = addressBusinessService.getAddressById(n.getAddress().getId());
+            AddressEntity addressEntity = addressService.getAddressById(n.getAddress().getId());
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress();
 
             responseAddress.setId(UUID.fromString(addressEntity.getUuid()));
@@ -271,7 +271,7 @@ public class RestaurantController {
         details.setNumberCustomersRated(restaurant.getNumCustomersRated());
 
         // Getting address of restaurant from address entity
-        AddressEntity addressEntity = addressBusinessService.getAddressById(restaurant.getAddress().getId());
+        AddressEntity addressEntity = addressService.getAddressById(restaurant.getAddress().getId());
         RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress();
 
         responseAddress.setId(UUID.fromString(addressEntity.getUuid()));

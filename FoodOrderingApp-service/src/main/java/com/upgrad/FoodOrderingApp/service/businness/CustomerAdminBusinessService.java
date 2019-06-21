@@ -133,7 +133,7 @@ public class CustomerAdminBusinessService {
         CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(authorizationToken);
 
         // Validates the provided access token
-        validateAccessToken(customerAuthTokenEntity);
+        validateAccessToken(authorizationToken);
 
         //get the customer Details using the customerUuid
         CustomerEntity customerEntity =  customerDao.getCustomerByUuid(customerAuthTokenEntity.getUuid());
@@ -163,7 +163,7 @@ public class CustomerAdminBusinessService {
         CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(authorizationToken);
 
         // Validates the provided access token
-        validateAccessToken(customerAuthTokenEntity);
+        validateAccessToken(authorizationToken);
 
         //get the customer Details using the customerUuid
         CustomerEntity customerEntity =  customerDao.getCustomerByUuid(customerAuthTokenEntity.getUuid());
@@ -214,7 +214,7 @@ public class CustomerAdminBusinessService {
         final ZonedDateTime now = ZonedDateTime.now();
 
         // Validates the provided access token
-        validateAccessToken(customerAuthTokenEntity);
+        validateAccessToken(authorizationToken);
 
         // Sets the logout time to now
         customerAuthTokenEntity.setLogoutAt(now);
@@ -225,7 +225,10 @@ public class CustomerAdminBusinessService {
     }
 
     @Transactional
-    public void validateAccessToken(CustomerAuthTokenEntity customerAuthTokenEntity) throws AuthorizationFailedException{
+    public void validateAccessToken(final String authorizationToken) throws AuthorizationFailedException{
+
+        //get the customerAuthToken details from customerDao
+        CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(authorizationToken);
 
         // Gets the current time
         final ZonedDateTime now = ZonedDateTime.now();

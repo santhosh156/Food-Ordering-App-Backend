@@ -14,7 +14,7 @@ public class StateDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public StateEntity getStateById(final Integer stateId) {
+    public StateEntity getStateById(final Long stateId) {
         try {
             return entityManager.createNamedQuery("stateById", StateEntity.class).setParameter("id", stateId)
                     .getSingleResult();

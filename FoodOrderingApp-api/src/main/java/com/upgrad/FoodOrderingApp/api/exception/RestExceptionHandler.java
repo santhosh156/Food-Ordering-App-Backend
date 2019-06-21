@@ -45,5 +45,11 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorResponse> SaveAddressException(SaveAddressException exc, WebRequest request) {
         return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.METHOD_NOT_ALLOWED);
     }
+    
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ErrorResponse> AddressNotFoundException(AddressNotFoundException exc, WebRequest request) {
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.UNAUTHORIZED);
+    }
 
 }

@@ -4,6 +4,8 @@ import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.AddressService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerAdminBusinessService;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerAddressEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -39,19 +41,21 @@ public class AddressController {
         addressEntity.setFlatBuildingNumber(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setPincode(saveAddressRequest.getPincode());
-        System.out.println(saveAddressRequest.getStateUuid());
-        //addressEntity.setStateId(addressService.getStateByUUID(saveAddressRequest.getStateUuid()).getId());
+        addressEntity.setState(addressService.getStateByUUID(saveAddressRequest.getStateUuid()));
         addressEntity.setUuid(UUID.randomUUID().toString());
         addressEntity.setActive(1);
 
-        // save the address
+        // Save the address
         AddressEntity savedAddressEntity = addressService.saveAddress(addressEntity, bearerToken[1]);
-        SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(savedAddressEntity.getUuid()).status("ADDRESS SUCCESSFULLY REGISTERED");
+
+        SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(savedAddressEntity.getUuid())
+                                                                            .status("ADDRESS SUCCESSFULLY REGISTERED");
         return new ResponseEntity<>(saveAddressResponse, HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllPermanentAddress(String authorization) throws AuthorizationFailedException {
+
         // Authentication Token
         String[] bearerToken = authorization.split("Bearer ");
 
@@ -68,7 +72,7 @@ public class AddressController {
             addressListResponse.addAddressesItem(addressList);
         }
 
-        return new ResponseEntity<>(addressListResponse, HttpStatus.OK);
+        return new ResponseEntity<AddressListResponse>(addressListResponse, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -83,7 +87,7 @@ public class AddressController {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<StatesListResponse> getAll(String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<StatesListResponse> getAllStates(String authorization) throws AuthorizationFailedException {
         // Authentication Token
         String[] bearerToken = authorization.split("Bearer ");
 

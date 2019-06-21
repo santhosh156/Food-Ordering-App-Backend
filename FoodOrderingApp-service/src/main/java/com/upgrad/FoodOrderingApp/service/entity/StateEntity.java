@@ -9,6 +9,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @Entity
 @Table(name = "state")
@@ -21,13 +23,12 @@ import java.io.Serializable;
         }
 )
 
-
 public class StateEntity implements Serializable {
 
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "UUID")
     @NotNull
@@ -38,11 +39,11 @@ public class StateEntity implements Serializable {
     @Size(max = 30)
     private String stateName;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

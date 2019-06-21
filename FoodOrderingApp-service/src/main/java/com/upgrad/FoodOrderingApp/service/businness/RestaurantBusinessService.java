@@ -28,6 +28,9 @@ public class RestaurantBusinessService {
     @Autowired
     private CustomerDao customerDao;
 
+    @Autowired
+    private CustomerAdminBusinessService customerAdminBusinessService;
+
     // A Method is for getAllRestaurants endpoint
     public List<RestaurantEntity> getAllRestaurants() {
         return restaurantDao.getAllRestaurants();
@@ -54,20 +57,8 @@ public class RestaurantBusinessService {
 
         final ZonedDateTime now = ZonedDateTime.now();
 
-        //get the customerAuthToken details from customerDao
-        CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(authorizationToken);
-
-        // Throw AuthorizationFailedException if the customer is not authorized
-        if (customerAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-            // Throw AuthorizationFailedException if the customer is logged out
-        } else if (customerAuthTokenEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-            // Throw AuthorizationFailedException if the customer session is expired
-        } else if (now.isAfter(customerAuthTokenEntity.getExpiresAt()) ) {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
-
+        // Validates the customer using the authorizationToken
+        customerAdminBusinessService.validateAccessToken(authorizationToken);
 
         // Throw exception if path variable(restaurant_id) is empty
         if(restaurant_id == null || restaurant_id.isEmpty() || restaurant_id.equalsIgnoreCase("\"\"")){

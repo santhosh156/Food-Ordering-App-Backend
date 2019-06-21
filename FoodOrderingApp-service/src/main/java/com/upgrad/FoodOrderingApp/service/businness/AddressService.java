@@ -1,17 +1,16 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.AddressDao;
-import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 import com.upgrad.FoodOrderingApp.service.dao.StateDao;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthTokenEntity;
-import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
@@ -33,27 +32,44 @@ public class AddressService {
     @Autowired
     private StateDao stateDao;
 
+    @Autowired
+    private CustomerAdminBusinessService customerAdminBusinessService;
+
     @Transactional
     public AddressEntity getAddressById(final Long addressId) {
         return addressDao.getAddressById(addressId);
     }
 
     @Transactional
-    public StateEntity getStateByUUID(String uuid) {
-        return stateDao.getStateByUuid(uuid);
+    public StateEntity getStateByUUID(String stateUuid) throws SaveAddressException, AddressNotFoundException{
+        StateEntity stateEntity = stateDao.getStateByUuid(stateUuid);
+        if(stateUuid.isEmpty()){
+            throw new SaveAddressException("SAR-001", "No field can be empty");
+        }
+        else if(stateEntity == null){
+            throw new AddressNotFoundException("ANF-002", "No state by this id");
+        } else {
+            return stateEntity;
+        }
+
     }
 
     @Transactional
-    public StateEntity getStateById(Integer stateId) {
+    public StateEntity getStateById(Long stateId) {
         return stateDao.getStateById(stateId);
     }
 
     @Transactional
-    public AddressEntity saveAddress(AddressEntity addressEntity, String bearerToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-        validateAccessToken(bearerToken);
+    public AddressEntity saveAddress(AddressEntity addressEntity, String bearerToken)
+            throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+
+        customerAdminBusinessService.validateAccessToken(bearerToken);
+
+        getStateByUUID(addressEntity.getState().getUuid());
 
         if (addressEntity.getCity() == null || addressEntity.getCity().isEmpty() ||
-                addressEntity.getState().getId() == null ||
+                addressEntity.getState() == null ||
+                //addressEntity.getState() == null ||
                 addressEntity.getFlatBuildingNumber() == null || addressEntity.getFlatBuildingNumber().isEmpty() ||
                 addressEntity.getLocality() == null || addressEntity.getLocality().isEmpty() ||
                 addressEntity.getPincode() == null || addressEntity.getPincode().isEmpty() ||
@@ -61,22 +77,40 @@ public class AddressService {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
         }
 
-        if (!addressEntity.getPincode().matches("^[1-9][0-9]{5}$")) {
-            throw new SaveAddressException("SAR-002", "Invalid pincode.");
-        }
+        /*if (stateDao.getStateByUuid(addressEntity.getState().getUuid()) == null) {
+            throw new AddressNotFoundException("ANF-002", "No state by this id");
+        }*/
 
         if (stateDao.getStateById(addressEntity.getState().getId()) == null) {
             throw new AddressNotFoundException("ANF-002", "No state by this id.");
         }
 
+        if (!addressEntity.getPincode().matches("^[1-9][0-9]{5}$")) {
+            throw new SaveAddressException("SAR-002", "Invalid pincode");
+        }
+
         addressEntity = addressDao.createAddress(addressEntity);
+
+        //get the customerAuthToken details from customerDao
+        CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(bearerToken);
+
+        // Save the customer address
+        final CustomerEntity customerEntity = customerDao.getCustomerByUuid(customerAuthTokenEntity.getUuid());
+        final CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
+
+        customerAddressEntity.setAddress(addressEntity);
+        customerAddressEntity.setCustomer(customerEntity);
+        customerAddressDao.createCustomerAddress(customerAddressEntity);
 
         return addressEntity;
     }
 
+
     @Transactional
-    public void deleteAddress(UUID addressId, String bearerToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-        validateAccessToken(bearerToken);
+    public void deleteAddress(UUID addressId, String bearerToken)
+            throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+
+        customerAdminBusinessService.validateAccessToken(bearerToken);
 
         if (addressId == null) {
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty.");
@@ -89,9 +123,9 @@ public class AddressService {
         }
     }
 
-    public List<AddressEntity> getAllAddress(String bearerToken) throws AuthorizationFailedException {
+    public List<AddressEntity> getAllAddress(final String bearerToken) throws AuthorizationFailedException {
 
-        validateAccessToken(bearerToken);
+        customerAdminBusinessService.validateAccessToken(bearerToken);
 
         //get the customerAuthToken details from customerDao
         CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(bearerToken);
@@ -100,25 +134,8 @@ public class AddressService {
     }
 
     public List<StateEntity> getAllStates(String bearerToken) throws AuthorizationFailedException {
-        validateAccessToken(bearerToken);
+        customerAdminBusinessService.validateAccessToken(bearerToken);
         return stateDao.getAllStates();
     }
 
-    private void validateAccessToken(String bearerToken) throws AuthorizationFailedException {
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        //get the customerAuthToken details from customerDao
-        CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(bearerToken);
-
-        // Throw AuthorizationFailedException if the customer is not authorized
-        if (customerAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
-            // Throw AuthorizationFailedException if the customer is logged out
-        } else if (customerAuthTokenEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
-            // Throw AuthorizationFailedException if the customer session is expired
-        } else if (now.isAfter(customerAuthTokenEntity.getExpiresAt())) {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
-    }
 }
