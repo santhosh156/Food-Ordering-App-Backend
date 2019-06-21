@@ -3,16 +3,12 @@ package com.upgrad.FoodOrderingApp.api.controller;
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
-import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -35,6 +31,8 @@ public class RestaurantController {
     @Autowired
     private ItemBusinessService itemBusinessService;
 
+    @Autowired
+    private CustomerAdminBusinessService customerAdminBusinessService;
 
     /**
      *
@@ -325,6 +323,24 @@ public class RestaurantController {
 
         // return response entity with RestaurantDetails(details) and Http status
         return new ResponseEntity<>(details, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/restaurant/{restaurant_id}",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity updateCustomerRating(@RequestHeader("authorization") final String authorization, @RequestParam Double customerRating, @PathVariable String restaurant_id )
+            throws AuthorizationFailedException, InvalidRatingException {
+
+        // Get the bearerToken
+        String[] bearerToken = authorization.split("Bearer ");
+
+        // Call the RestaurantBusinessService to update the customer
+        RestaurantEntity restaurantEntity = restaurantBusinessService.updateCustomerRating(customerRating, restaurant_id, bearerToken[1]);
+
+        // Attach the details to the updateResponse
+        RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse().setId(UUID.fromString(restaurantEntity.getUuid()))
+                .status("RESTAURANT RATING UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<RestaurantUpdatedResponse>(restaurantUpdatedResponse, HttpStatus.OK);
     }
 
 }
