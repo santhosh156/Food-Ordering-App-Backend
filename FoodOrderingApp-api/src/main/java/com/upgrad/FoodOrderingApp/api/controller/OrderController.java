@@ -3,10 +3,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
-import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
-import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.PaymentMethodNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.hibernate.internal.CriteriaImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +37,12 @@ public class OrderController {
 
     @Autowired
     private StateService stateService;
+
+    @Autowired
+    private RestaurantBusinessService restaurantBusinessService;
+
+    @Autowired
+    private ItemService itemService;
 
     @RequestMapping(method = RequestMethod.GET, path = "/order/coupon/{coupon_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CouponDetailsResponse> getCoupon(@RequestHeader("authorization")  final String authorization, @PathVariable("coupon_name") final String couponName)
@@ -145,23 +148,45 @@ public class OrderController {
     @RequestMapping(method= RequestMethod.POST, path="/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse>saveOrder(final SaveOrderRequest saveOrderRequest,
                                                 @RequestHeader("authorization") final String authorization)
-            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException {
+            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException {
 
         String[] bearerToken = authorization.split( "Bearer ");
-
         final OrdersEntity ordersEntity = new OrdersEntity();
 
+        // Gets coupon details based on uuid
+        CouponEntity couponEntity = couponService.getCouponByUuid(saveOrderRequest.getCouponId());
+
+        // Adds coupon to the order
+        ordersEntity.setCoupon(couponEntity);
+
+        // Gets address details based on id
         AddressEntity addressEntity = addressService.getAddressById(Long.parseLong(saveOrderRequest.getAddressId()));
+
+        // Adds address to the order
         ordersEntity.setAddress(addressEntity);
 
+        // Gets the payment method based on uuid
         PaymentEntity paymentEntity = paymentService.getPaymentByUuid(saveOrderRequest.getPaymentId().toString());
+
+        if (paymentEntity == null) {
+            throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
+        }
+
+        // Adds payment method to the order
         ordersEntity.setPayment(paymentEntity);
 
+        // Gets restaurant details based on uuid
+        RestaurantEntity restaurantEntity = restaurantBusinessService.getRestaurantByUUId(saveOrderRequest.getRestaurantId().toString());
+
+        // Adds restaurant to the order
+        ordersEntity.setRestaurant(restaurantEntity);
+
+        // Gets item details based on item uuid
+        //ItemEntity itemEntity = itemService.getItemEntityById(saveOrderRequest.getItemQuantities());
+
+        // Adds the bill amount and discount to the order
         ordersEntity.setBill(saveOrderRequest.getBill());
         ordersEntity.setDiscount(saveOrderRequest.getDiscount());
-
-        CouponEntity couponEntity = couponService.getCouponByUuid(saveOrderRequest.getCouponId());
-        ordersEntity.setCoupon(couponEntity);
 
         final OrdersEntity savedOrderEntity = orderService.saveOrder(ordersEntity, bearerToken[1]);
         SaveOrderResponse saveOrderResponse = new SaveOrderResponse().id(savedOrderEntity.getUuid())

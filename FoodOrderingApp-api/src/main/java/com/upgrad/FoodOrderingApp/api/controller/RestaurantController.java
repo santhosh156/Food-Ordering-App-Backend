@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/")
 public class RestaurantController {
 
@@ -27,9 +28,6 @@ public class RestaurantController {
 
     @Autowired
     private CategoryBusinessService categoryBusinessService;
-
-    @Autowired
-    private ItemBusinessService itemBusinessService;
 
     @Autowired
     private CustomerAdminBusinessService customerAdminBusinessService;

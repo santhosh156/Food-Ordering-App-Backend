@@ -12,6 +12,7 @@ import java.io.Serializable;
 @NamedQueries(
         {
                 @NamedQuery(name = "orderItemById", query = "select o from OrderItemEntity o where o.id=:id"),
+                @NamedQuery(name = "itemsByOrder", query = "select o from OrderItemEntity o where o.orders=:order"),
         }
 )
 

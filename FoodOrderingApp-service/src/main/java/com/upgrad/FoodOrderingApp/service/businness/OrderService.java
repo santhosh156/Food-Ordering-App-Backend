@@ -3,10 +3,7 @@ package com.upgrad.FoodOrderingApp.service.businness;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 import com.upgrad.FoodOrderingApp.service.dao.OrderDao;
 import com.upgrad.FoodOrderingApp.service.entity.*;
-import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
-import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.PaymentMethodNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,27 +50,22 @@ public class OrderService {
 
     @Transactional
     public OrdersEntity saveOrder(OrdersEntity ordersEntity, final String authorizationToken)
-            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException {
+            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, RestaurantNotFoundException {
 
         // Validates the provided access token
         customerAdminBusinessService.validateAccessToken(authorizationToken);
 
-        CouponEntity couponEntity = couponService.getCouponByUuid(ordersEntity.getCoupon().getUuid());
-
-        if (couponEntity == null) {
+        // Throws CouponNotFoundException if coupon not found
+        if (ordersEntity.getCoupon() == null) {
             throw new CouponNotFoundException("CPF-002", "No coupon by this id");
-        }
-
-        AddressEntity addressEntity = addressService.getAddressById(ordersEntity.getAddress().getId());
-
-        if (addressEntity == null) {
+        // Throws AddressNotFoundException if address not found
+        } else if (ordersEntity.getAddress() == null) {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
-        }
-
-        PaymentEntity paymentEntity = paymentService.getPaymentByUuid(ordersEntity.getUuid());
-
-        if (paymentEntity ==  null) {
+        // Throws PaymentMethodNotFoundException id payment method not found
+        } else if (ordersEntity.getPayment() ==  null) {
             throw new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id");
+        } else if (ordersEntity.getRestaurant() == null) {
+            throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
         }
 
         return orderDao.saveOrder(ordersEntity);
