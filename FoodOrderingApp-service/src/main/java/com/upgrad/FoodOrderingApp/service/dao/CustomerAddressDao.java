@@ -33,7 +33,7 @@ public class CustomerAddressDao {
             List<Long> ids = new ArrayList<>();
 
             for (CustomerAddressEntity cae : customerAddressEntities) {
-                ids.add(cae.getAddressId());
+                ids.add(cae.getAddress().getId());
             }
 
             List<AddressEntity> addressEntitiesList = entityManager.createQuery(

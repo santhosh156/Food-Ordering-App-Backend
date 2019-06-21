@@ -14,6 +14,7 @@ import java.io.Serializable;
 @NamedQueries(
         {
                 @NamedQuery(name = "stateById", query = "select s from StateEntity s where s.id = :id"),
+                @NamedQuery(name = "stateByUuid", query = "select s from StateEntity s where s.uuid = :uuid")
         }
 )
 
@@ -23,7 +24,7 @@ public class StateEntity implements Serializable {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "UUID")
     @NotNull
@@ -35,11 +36,11 @@ public class StateEntity implements Serializable {
     @Size(max = 30)
     private String stateName;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

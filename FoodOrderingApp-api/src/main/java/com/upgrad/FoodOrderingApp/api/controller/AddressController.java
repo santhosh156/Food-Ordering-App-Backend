@@ -36,13 +36,13 @@ public class AddressController {
 
         AddressEntity addressEntity = new AddressEntity();
         addressEntity.setCity(saveAddressRequest.getCity());
-        addressEntity.setFlatBuildingNumber(saveAddressRequest.getFlatBuildingName());
+        addressEntity.setFlatBldgNumber(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setPincode(saveAddressRequest.getPincode());
         System.out.println(saveAddressRequest.getStateUuid());
         //addressEntity.setStateId(addressService.getStateByUUID(saveAddressRequest.getStateUuid()).getId());
         addressEntity.setUuid(UUID.randomUUID().toString());
-        addressEntity.setActive(1L);
+        addressEntity.setActive(1);
 
         // save the address
         AddressEntity savedAddressEntity = addressService.saveAddress(addressEntity, bearerToken[1]);
@@ -59,11 +59,11 @@ public class AddressController {
 
         AddressListResponse addressListResponse = new AddressListResponse();
         for (AddressEntity ae : addressEntityList) {
-            StateEntity se = addressService.getStateById(ae.getStateId());
+            StateEntity se = addressService.getStateById(ae.getState().getId());
 
             AddressListState addressListState = new AddressListState();
             addressListState.setStateName(se.getStateName());
-            AddressList addressList = new AddressList().city(ae.getCity()).flatBuildingName(ae.getFlatBuildingNumber())
+            AddressList addressList = new AddressList().city(ae.getCity()).flatBuildingName(ae.getFlatBldgNumber())
                     .locality(ae.getLocality()).pincode(ae.getPincode()).state(addressListState);
             addressListResponse.addAddressesItem(addressList);
         }
@@ -92,7 +92,7 @@ public class AddressController {
         for (StateEntity se : stateEntityList) {
             StatesList state = new StatesList();
             state.setStateName(se.getStateName());
-            state.setId(se.getUuid());
+            state.setId(UUID.fromString(se.getUuid()));
             stateListResponse.addStatesItem(state);
         }
 

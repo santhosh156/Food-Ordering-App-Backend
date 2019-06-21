@@ -17,4 +17,9 @@ public class StateBusinessService {
     public StateEntity getStateById (final Long stateId) {
         return stateDao.getStateById(stateId);
     }
+
+    @Transactional
+    public StateEntity getStateByUuid (final String stateUuid) {
+        return stateDao.getStateByUuid(stateUuid);
+    }
 }

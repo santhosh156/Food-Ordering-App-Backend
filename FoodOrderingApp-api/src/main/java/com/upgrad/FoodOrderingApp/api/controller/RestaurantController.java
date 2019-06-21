@@ -53,11 +53,11 @@ public class RestaurantController {
             detail.setAveragePrice(n.getAvgPriceForTwo());
             detail.setNumberCustomersRated(n.getNumCustomersRated());
 
-            AddressEntity addressEntity = addressBusinessService.getAddressById(n.getAddress().getUuid());
+            AddressEntity addressEntity = addressBusinessService.getAddressById(n.getAddress().getId());
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress();
 
             responseAddress.setId(UUID.fromString(addressEntity.getUuid()));
-            responseAddress.setFlatBuildingName(addressEntity.getFlatBuildingNumber());
+            responseAddress.setFlatBuildingName(addressEntity.getFlatBldgNumber());
             responseAddress.setLocality(addressEntity.getLocality());
             responseAddress.setCity(addressEntity.getCity());
             responseAddress.setPincode(addressEntity.getPincode());
@@ -65,7 +65,7 @@ public class RestaurantController {
             StateEntity stateEntity = stateBusinessService.getStateById(addressEntity.getState().getId());
             RestaurantDetailsResponseAddressState responseAddressState = new RestaurantDetailsResponseAddressState();
 
-            responseAddressState.setId(stateEntity.getUuid());
+            responseAddressState.setId(UUID.fromString(stateEntity.getUuid()));
             responseAddressState.setStateName(stateEntity.getStateName());
             responseAddress.setState(responseAddressState);
 

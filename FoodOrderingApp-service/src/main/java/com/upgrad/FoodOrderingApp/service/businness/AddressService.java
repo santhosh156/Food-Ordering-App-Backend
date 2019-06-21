@@ -46,8 +46,8 @@ public class AddressService {
         validateAccessToken(bearerToken);
 
         if (addressEntity.getCity() == null || addressEntity.getCity().isEmpty() ||
-                addressEntity.getStateId() == null ||
-                addressEntity.getFlatBuildingNumber() == null || addressEntity.getFlatBuildingNumber().isEmpty() ||
+                addressEntity.getState().getId() == null ||
+                addressEntity.getFlatBldgNumber() == null || addressEntity.getFlatBldgNumber().isEmpty() ||
                 addressEntity.getLocality() == null || addressEntity.getLocality().isEmpty() ||
                 addressEntity.getPincode() == null || addressEntity.getPincode().isEmpty() ||
                 addressEntity.getUuid() == null || addressEntity.getUuid().isEmpty()) {
@@ -58,7 +58,7 @@ public class AddressService {
             throw new SaveAddressException("SAR-002", "Invalid pincode.");
         }
 
-        if (stateDao.getStateById(addressEntity.getStateId()) == null) {
+        if (stateDao.getStateById(addressEntity.getState().getId()) == null) {
             throw new AddressNotFoundException("ANF-002", "No state by this id.");
         }
 

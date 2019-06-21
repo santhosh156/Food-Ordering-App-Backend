@@ -22,7 +22,7 @@ public class AddressEntity implements Serializable {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "UUID")
     @NotNull
@@ -57,11 +57,11 @@ public class AddressEntity implements Serializable {
     @NotNull
     private Integer active;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

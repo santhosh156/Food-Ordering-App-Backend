@@ -14,7 +14,7 @@ public class AddressBusinessService {
     private AddressDao addressDao;
 
     @Transactional
-    public AddressEntity getAddressById(final String addressId) {
-        return addressDao.getAddressByUuid(addressId);
+    public AddressEntity getAddressById(final Long addressId) {
+        return addressDao.getAddressById(addressId);
     }
 }
