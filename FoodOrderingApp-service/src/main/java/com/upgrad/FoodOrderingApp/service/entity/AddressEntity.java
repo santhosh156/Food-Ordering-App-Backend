@@ -4,6 +4,13 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -17,7 +24,6 @@ import java.io.Serializable;
         }
 )
 
-
 public class AddressEntity implements Serializable {
 
     @Id
@@ -25,14 +31,16 @@ public class AddressEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "UUID")
+    @Column(name = "uuid")
     @Size(max = 200)
     private String uuid;
 
     @Column(name = "FLAT_BUIL_NUMBER")
-    private String flatBuilNumber;
+    @Size(max = 255)
+    private String flatBuildingNumber;
 
     @Column(name = "LOCALITY")
+    @Size(max = 255)
     private String locality;
 
     @Column(name = "CITY")
@@ -41,21 +49,21 @@ public class AddressEntity implements Serializable {
 
     @Column(name = "PINCODE")
     @Size(max = 30)
-    private String pinCode;
+    private String pincode;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "STATE_ID")
     private StateEntity state;
 
-    @Column(name="ACTIVE")
+    @Column(name = "active")
     private Integer active;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -67,12 +75,12 @@ public class AddressEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getFlatBuilNumber() {
-        return flatBuilNumber;
+    public String getFlatBuildingNumber() {
+        return flatBuildingNumber;
     }
 
-    public void setFlatBuilNumber(String flatBuilNumber) {
-        this.flatBuilNumber = flatBuilNumber;
+    public void setFlatBuildingNumber(String flatBuildingNumber) {
+        this.flatBuildingNumber = flatBuildingNumber;
     }
 
     public String getLocality() {
@@ -91,12 +99,12 @@ public class AddressEntity implements Serializable {
         this.city = city;
     }
 
-    public String getPinCode() {
-        return pinCode;
+    public String getPincode() {
+        return pincode;
     }
 
-    public void setPinCode(String pinCode) {
-        this.pinCode = pinCode;
+    public void setPincode(String pincode) {
+        this.pincode = pincode;
     }
 
     public StateEntity getState() {

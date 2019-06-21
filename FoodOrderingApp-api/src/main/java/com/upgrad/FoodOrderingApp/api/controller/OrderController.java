@@ -119,10 +119,10 @@ public class OrderController {
 
             OrderListAddress orderListAddress = new OrderListAddress();
             orderListAddress.setId(UUID.fromString(addressEntity.getUuid()));
-            orderListAddress.setFlatBuildingName(addressEntity.getFlatBuilNumber());
+            orderListAddress.setFlatBuildingName(addressEntity.getFlatBuildingNumber());
             orderListAddress.setLocality(addressEntity.getLocality());
             orderListAddress.setCity(addressEntity.getCity());
-            orderListAddress.setPincode(addressEntity.getPinCode());
+            orderListAddress.setPincode(addressEntity.getPincode());
 
             // Getting state details of the restaurant address and adding it to address and details
             StateEntity stateEntity = stateService.getStateById(oe.getAddress().getState().getId());

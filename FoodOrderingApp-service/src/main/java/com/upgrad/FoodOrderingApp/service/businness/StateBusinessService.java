@@ -8,13 +8,20 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 @Service
-public class StateService {
+public class StateBusinessService {
 
     @Autowired
     private StateDao stateDao;
 
     @Transactional
-    public StateEntity getStateById(final Integer stateId) {
+    // A Method which takes the stateId as parameter for  getStateById endpoint
+    public StateEntity getStateById (final Integer stateId) {
+
         return stateDao.getStateById(stateId);
+    }
+
+    @Transactional
+    public StateEntity getStateByUuid (final String stateUuid) {
+        return stateDao.getStateByUuid(stateUuid);
     }
 }

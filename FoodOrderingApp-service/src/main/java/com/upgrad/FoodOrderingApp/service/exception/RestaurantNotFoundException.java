@@ -11,6 +11,7 @@ public class RestaurantNotFoundException extends Exception {
     private final String errorMessage;
 
     public RestaurantNotFoundException(final String code, final String errorMessage) {
+        super(errorMessage);
         this.code = code;
         this.errorMessage = errorMessage;
     }

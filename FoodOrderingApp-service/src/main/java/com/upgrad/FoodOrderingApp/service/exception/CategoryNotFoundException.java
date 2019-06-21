@@ -11,6 +11,7 @@ public class CategoryNotFoundException extends Exception {
     private final String errorMessage;
 
     public CategoryNotFoundException(final String code, final String errorMessage) {
+        super(errorMessage);
         this.code = code;
         this.errorMessage = errorMessage;
     }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class StateDao {
@@ -13,7 +14,7 @@ public class StateDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public StateEntity getStateById(Long stateId) {
+    public StateEntity getStateById(final Integer stateId) {
         try {
             return entityManager.createNamedQuery("stateById", StateEntity.class).setParameter("id", stateId)
                     .getSingleResult();
@@ -21,4 +22,22 @@ public class StateDao {
             return null;
         }
     }
+
+    public StateEntity getStateByUuid(final String stateUuid) {
+        try {
+            return entityManager.createNamedQuery("stateByUuid", StateEntity.class).setParameter("uuid", stateUuid)
+                    .getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
+    }
+
+    public List<StateEntity> getAllStates() {
+        try {
+            return entityManager.createNamedQuery("allStates", StateEntity.class).getResultList();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
 }

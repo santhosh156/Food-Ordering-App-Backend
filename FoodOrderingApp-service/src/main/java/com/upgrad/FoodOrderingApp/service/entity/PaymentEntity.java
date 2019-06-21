@@ -1,6 +1,12 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -14,25 +20,28 @@ import java.io.Serializable;
         }
 )
 
-public class PaymentEntity implements Serializable {
 
+public class PaymentEntity {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "UUID")
+    @NotNull
     @Size(max = 200)
     private String uuid;
 
-    @Column(name = "PAYMENT_NAME")
+    @Column(name="PAYMENT_NAME")
+    @NotNull
+    @Size(max = 255)
     private String paymentName;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -52,3 +61,4 @@ public class PaymentEntity implements Serializable {
         this.paymentName = paymentName;
     }
 }
+
