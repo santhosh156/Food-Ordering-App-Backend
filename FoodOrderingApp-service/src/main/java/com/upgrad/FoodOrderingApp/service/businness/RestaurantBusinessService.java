@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+
 import java.util.List;
 
 @Service
@@ -94,6 +95,5 @@ public class RestaurantBusinessService {
         restaurantDao.updateRestaurant(restaurantEntity);
         return restaurantEntity;
     }
-
 
 }

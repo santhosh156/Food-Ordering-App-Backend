@@ -34,10 +34,6 @@ public class RestaurantController {
     @Autowired
     private CustomerAdminBusinessService customerAdminBusinessService;
 
-    /**
-     *
-     * @return All restaurant stored in database
-     */
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity getAllRestaurants() {
 

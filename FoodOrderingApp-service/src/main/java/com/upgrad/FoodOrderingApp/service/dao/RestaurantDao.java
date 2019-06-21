@@ -15,9 +15,6 @@ public class RestaurantDao  {
     @PersistenceContext
     private EntityManager entityManager;
 
-    /**
-     *
-     */
     public List<RestaurantEntity> getAllRestaurants() {
         try {
             return entityManager.createNamedQuery("allRestaurants", RestaurantEntity.class).getResultList();
@@ -53,4 +50,5 @@ public class RestaurantDao  {
     public void updateRestaurant(final RestaurantEntity updatedRestaurantEntity) {
         entityManager.merge(updatedRestaurantEntity);
     }
+  
 }

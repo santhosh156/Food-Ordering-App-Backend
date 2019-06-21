@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "restaurant")
@@ -108,7 +109,6 @@ public class RestaurantEntity implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public String getRestaurantName() {
         return restaurantName;
