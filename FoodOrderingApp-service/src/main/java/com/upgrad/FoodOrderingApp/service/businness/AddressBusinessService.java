@@ -14,6 +14,7 @@ public class AddressBusinessService {
     private AddressDao addressDao;
 
     @Transactional
+    // A Method which takes the addressId as parameter for  getAddressById endpoint
     public AddressEntity getAddressById(final Long addressId) {
         return addressDao.getAddressById(addressId);
     }
