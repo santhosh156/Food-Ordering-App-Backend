@@ -3,8 +3,10 @@ package com.upgrad.FoodOrderingApp.api.controller;
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
+import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.PaymentMethodNotFoundException;
 import org.hibernate.internal.CriteriaImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/")
 public class OrderController {
 
@@ -130,11 +133,40 @@ public class OrderController {
             orderListAddress.setState(orderListAddressState);
 
             detail.setAddress(orderListAddress);
+
             orderDetailsList.add(detail);
 
         }
 
         return new ResponseEntity<>(orderDetailsList, HttpStatus.OK);
 
+    }
+
+    @RequestMapping(method= RequestMethod.POST, path="/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SaveOrderResponse>saveOrder(final SaveOrderRequest saveOrderRequest,
+                                                @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, CouponNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException {
+
+        String[] bearerToken = authorization.split( "Bearer ");
+
+        final OrdersEntity ordersEntity = new OrdersEntity();
+
+        AddressEntity addressEntity = addressService.getAddressById(Long.parseLong(saveOrderRequest.getAddressId()));
+        ordersEntity.setAddress(addressEntity);
+
+        PaymentEntity paymentEntity = paymentService.getPaymentByUuid(saveOrderRequest.getPaymentId().toString());
+        ordersEntity.setPayment(paymentEntity);
+
+        ordersEntity.setBill(saveOrderRequest.getBill());
+        ordersEntity.setDiscount(saveOrderRequest.getDiscount());
+
+        CouponEntity couponEntity = couponService.getCouponByUuid(saveOrderRequest.getCouponId());
+        ordersEntity.setCoupon(couponEntity);
+
+        final OrdersEntity savedOrderEntity = orderService.saveOrder(ordersEntity, bearerToken[1]);
+        SaveOrderResponse saveOrderResponse = new SaveOrderResponse().id(savedOrderEntity.getUuid())
+                .status("ORDER SUCCESSFULLY PLACED");
+
+        return new ResponseEntity<SaveOrderResponse>(saveOrderResponse, HttpStatus.OK);
     }
 }

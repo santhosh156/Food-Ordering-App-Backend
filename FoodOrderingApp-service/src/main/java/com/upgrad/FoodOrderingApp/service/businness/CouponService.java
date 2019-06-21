@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 public class CouponService {
@@ -14,8 +15,13 @@ public class CouponService {
     private CouponDao couponDao;
 
     @Transactional
-    public CouponEntity getCouponById(Long couponId) {
+    public CouponEntity getCouponById(final Long couponId) {
         return couponDao.getCouponById(couponId);
+    }
+
+    @Transactional
+    public CouponEntity getCouponByUuid(final UUID couponUuid) {
+        return couponDao.getCouponByUuid(couponUuid);
     }
 
 }

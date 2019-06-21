@@ -20,7 +20,12 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentEntity getPaymentById(Long paymentId) {
-        return paymentDao.getPaymentForId(paymentId);
+    public PaymentEntity getPaymentById(final Long paymentId) {
+        return paymentDao.getPaymentById(paymentId);
+    }
+
+    @Transactional
+    public PaymentEntity getPaymentByUuid(final String paymentUuid) {
+        return paymentDao.getPaymentByUuid(paymentUuid);
     }
 }

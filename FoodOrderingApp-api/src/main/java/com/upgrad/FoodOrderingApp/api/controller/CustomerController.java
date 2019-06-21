@@ -19,6 +19,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/")
 public class CustomerController {
 
@@ -39,7 +40,8 @@ public class CustomerController {
         customerEntity.setPassword(signupCustomerRequest.getPassword());
 
         final CustomerEntity createdCustomerEntity = customerAdminBusinessService.signup(customerEntity);
-        SignupCustomerResponse customerResponse = new SignupCustomerResponse().id(createdCustomerEntity.getUuid()).status("CUSTOMER SUCCESSFULLY REGISTERED");
+        SignupCustomerResponse customerResponse = new SignupCustomerResponse().id(createdCustomerEntity.getUuid())
+                .status("CUSTOMER SUCCESSFULLY REGISTERED");
 
         return new ResponseEntity<SignupCustomerResponse>(customerResponse, HttpStatus.CREATED);
 

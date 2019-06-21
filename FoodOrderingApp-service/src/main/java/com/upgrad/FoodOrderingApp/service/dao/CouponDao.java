@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.UUID;
 
 @Repository
 public class CouponDao {
@@ -16,6 +17,15 @@ public class CouponDao {
     public CouponEntity getCouponById(Long couponId) {
         try {
             return entityManager.createNamedQuery("couponById", CouponEntity.class).setParameter("id", couponId)
+                    .getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
+    }
+
+    public CouponEntity getCouponByUuid(UUID couponId) {
+        try {
+            return entityManager.createNamedQuery("couponByUuid", CouponEntity.class).setParameter("uuid", couponId)
                     .getSingleResult();
         } catch(NoResultException nre) {
             return null;

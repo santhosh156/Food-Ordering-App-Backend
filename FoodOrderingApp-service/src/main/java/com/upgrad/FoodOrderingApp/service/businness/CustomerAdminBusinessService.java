@@ -129,11 +129,10 @@ public class CustomerAdminBusinessService {
     public CustomerEntity updateCustomer (CustomerEntity updatedCustomerEntity, final String authorizationToken)
             throws AuthorizationFailedException, UpdateCustomerException {
 
-        final ZonedDateTime now = ZonedDateTime.now();
-
         //get the customerAuthToken details from customerDao
         CustomerAuthTokenEntity customerAuthTokenEntity = customerDao.getCustomerAuthToken(authorizationToken);
 
+        // Validates the provided access token
         validateAccessToken(customerAuthTokenEntity);
 
         //get the customer Details using the customerUuid
@@ -242,6 +241,11 @@ public class CustomerAdminBusinessService {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
+    }
+
+    @Transactional
+    public CustomerAuthTokenEntity getCustomerAuthToken(final String accessToken) {
+        return customerDao.getCustomerAuthToken(accessToken);
     }
 
 }

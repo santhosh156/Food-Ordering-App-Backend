@@ -23,9 +23,18 @@ public class PaymentDao {
         }
     }
 
-    public PaymentEntity getPaymentForId(Long paymentId) {
+    public PaymentEntity getPaymentById(Long paymentId) {
         try {
             return this.entityManager.createNamedQuery("paymentById", PaymentEntity.class).setParameter("id", paymentId)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    public PaymentEntity getPaymentByUuid(String uuid) {
+        try {
+            return this.entityManager.createNamedQuery("paymentByUuid", PaymentEntity.class).setParameter("uuid", uuid)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;

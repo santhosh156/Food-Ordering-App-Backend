@@ -9,7 +9,8 @@ import java.io.Serializable;
 @NamedQueries(
         {
                 @NamedQuery(name = "allPaymentMethods", query = "select p from PaymentEntity p "),
-                @NamedQuery(name = "paymentById", query = "select p from PaymentEntity p where p.id=:id")
+                @NamedQuery(name = "paymentById", query = "select p from PaymentEntity p where p.id=:id"),
+                @NamedQuery(name = "paymentByUuid", query = "select p from PaymentEntity p where p.uuid=:uuid"),
         }
 )
 
