@@ -33,7 +33,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(UpdateCustomerException.class)
     public ResponseEntity<ErrorResponse> UpdateCustomerException(UpdateCustomerException exc, WebRequest request) {
-        return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<ErrorResponse>(new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(CouponNotFoundException.class)

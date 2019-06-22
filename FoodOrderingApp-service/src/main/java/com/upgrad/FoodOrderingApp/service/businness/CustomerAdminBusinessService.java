@@ -105,15 +105,9 @@ public class CustomerAdminBusinessService {
 
             //Call the createAuthToken() method in CustomerDao class for customerDao
             //Pass customerAuthTokenEntity as an argument
-
             customerDao.createAuthToken(customerAuthTokenEntity);
 
-            //To update the last login time of customer
-            //Carefully read how to update the existing record in a database(will be asked in later Assessments)
-            //When the persistence context is closed the entity becomes detached and any further changes to the entity will not be saved
-            //You need to associate the detached entity with a persistence context through merge() method to update the entity
             //updateCustomer() method in CustomerDao class calls the merge() method to update the customerEntity
-
             customerDao.updateCustomer(customerEntity);
             return customerAuthTokenEntity;
 
@@ -248,6 +242,7 @@ public class CustomerAdminBusinessService {
 
     @Transactional
     public CustomerAuthTokenEntity getCustomerAuthToken(final String accessToken) {
+        // Calls customerDao to get the access token of the customer from the database
         return customerDao.getCustomerAuthToken(accessToken);
     }
 

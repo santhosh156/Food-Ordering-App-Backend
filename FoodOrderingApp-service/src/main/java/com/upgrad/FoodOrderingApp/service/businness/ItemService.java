@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ItemService {
@@ -53,9 +55,21 @@ public class ItemService {
             }
         }
 
+
         // Maps each item with its respective order count
         Map<String, Integer> map = new HashMap<String, Integer>();
-        for (ItemEntity itemEntity : itemEntityList) {
+        Stream<Map.Entry<String,Integer>> sorted =
+                map.entrySet().stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()));
+
+        Map<String,Integer> topFive =
+                map.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .limit(5)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+        /*for (ItemEntity itemEntity : itemEntityList) {
             Integer count = map.get(itemEntity.getUuid());
             map.put(itemEntity.getUuid(), (count == null) ? 1 : count + 1);
         }
@@ -66,7 +80,12 @@ public class ItemService {
         for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
             sortedItemEntityList.add(itemDao.getItemByUuid(entry.getKey()));
         }
-        Collections.reverse(sortedItemEntityList);
+        //Collections.reverse(sortedItemEntityList);*/
+
+        List<ItemEntity> sortedItemEntityList = new ArrayList<ItemEntity>();
+        for (Map.Entry<String, Integer> entry : topFive.entrySet()) {
+            sortedItemEntityList.add(itemDao.getItemByUuid(entry.getKey()));
+        }
 
         return sortedItemEntityList;
     }
