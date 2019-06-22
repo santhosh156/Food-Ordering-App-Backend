@@ -25,7 +25,7 @@ public class CategoryDao {
 
     public CategoryEntity getCategoryByUUId(final String categoryUUId){
         try {
-            return entityManager.createNamedQuery("categoryByUUId", CategoryEntity.class).setParameter("categoryUUID", categoryUUId)
+            return entityManager.createNamedQuery("categoryByUuid", CategoryEntity.class).setParameter("uuid", categoryUUId)
                     .getSingleResult();
         } catch(NoResultException nre) {
             return null;

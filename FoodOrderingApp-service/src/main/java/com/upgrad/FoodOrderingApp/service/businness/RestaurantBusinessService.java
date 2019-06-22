@@ -42,8 +42,8 @@ public class RestaurantBusinessService {
     }
 
     // A Method which takes the categoryUUID as parameter for  getRestaurantByCategoryId endpoint
-    public List<RestaurantCategoryEntity> getRestaurantByCategoryId(String categoryUUID) {
-        return restaurantDao.getRestaurantByCategoryId(categoryUUID);
+    public List<RestaurantCategoryEntity> getRestaurantByCategoryId(final Long categoryID) {
+        return restaurantDao.getRestaurantByCategoryId(categoryID);
     }
 
     // A Method which takes the restaurantUUID as parameter for  getRestaurantByUUId endpoint
@@ -79,7 +79,7 @@ public class RestaurantBusinessService {
 
 
         // Now set the updated password and attach it to the customerEntity
-        restaurantEntity.setCustomerRating(new BigDecimal(customerRating));
+        restaurantEntity.setCustomerRating(BigDecimal.valueOf(customerRating));
         restaurantEntity.setNumCustomersRated(restaurantEntity.getNumCustomersRated() + 1);
 
         //called customerDao to merge the content and update in the database

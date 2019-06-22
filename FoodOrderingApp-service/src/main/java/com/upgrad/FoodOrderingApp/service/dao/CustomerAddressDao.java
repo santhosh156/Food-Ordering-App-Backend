@@ -40,11 +40,21 @@ public class CustomerAddressDao {
             }
 
             List<AddressEntity> addressEntitiesList = entityManager.createQuery(
-                    "SELECT a FROM AddressEntity a WHERE a.id in :addressIds AND a.active = 1", AddressEntity.class)
+                    "SELECT a FROM AddressEntity a WHERE a.id in :addressIds AND a.active = 1 order by a.id desc", AddressEntity.class)
                     .setParameter("addressIds", ids).getResultList();
 
             return addressEntitiesList;
         } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    public CustomerAddressEntity getCustAddressByCustIdAddressId(final CustomerEntity customerEntity, final AddressEntity addressEntity) {
+        try {
+            return entityManager.createNamedQuery("custAddressByCustIdAddressId", CustomerAddressEntity.class)
+                    .setParameter("customer", customerEntity).setParameter( "address", addressEntity)
+                    .getSingleResult();
+        } catch(NoResultException nre) {
             return null;
         }
     }

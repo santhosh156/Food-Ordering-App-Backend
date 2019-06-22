@@ -21,7 +21,7 @@ public class CategoryBusinessService {
     }
 
     // A Method which takes the categoryUUId as parameter for  getCategoryEntityByUUId endpoint
-    public CategoryEntity getCategoryEntityByUUId(final String categoryUUId){
+    public CategoryEntity getCategoryEntityByUuid(final String categoryUUId){
         return  categoryDao.getCategoryByUUId(categoryUUId);
     }
 

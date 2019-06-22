@@ -107,20 +107,26 @@ public class AddressService {
 
 
     @Transactional
-    public void deleteAddress(UUID addressId, String bearerToken)
-            throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+    public AddressEntity deleteAddress(String addressUuid, String bearerToken)
+            throws AuthorizationFailedException, AddressNotFoundException {
 
         customerAdminBusinessService.validateAccessToken(bearerToken);
+        CustomerAuthTokenEntity customerAuthTokenEntity = customerAdminBusinessService.getCustomerAuthToken(bearerToken);
 
-        if (addressId == null) {
+        if (addressUuid == null) {
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty.");
         }
 
-        AddressEntity address = addressDao.deleteAddressByUuid(addressId.toString());
+        AddressEntity addressEntity = addressDao.getAddressByUuid(addressUuid);
+        CustomerAddressEntity customerAddressEntity = customerAddressDao.getCustAddressByCustIdAddressId(customerAuthTokenEntity.getCustomer(), addressEntity);
 
-        if (address == null) {
+        if (addressEntity == null) {
             throw new AddressNotFoundException("ANF-003", "No address by this id.");
+        } else if (customerAddressEntity == null) {
+            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address");
         }
+
+        return addressDao.deleteAddressByUuid(addressEntity);
     }
 
     public List<AddressEntity> getAllAddress(final String bearerToken) throws AuthorizationFailedException {
@@ -133,8 +139,8 @@ public class AddressService {
         return customerAddressDao.getAddressForCustomerByUuid(customerAuthTokenEntity.getCustomer().getUuid());
     }
 
-    public List<StateEntity> getAllStates(String bearerToken) throws AuthorizationFailedException {
-        customerAdminBusinessService.validateAccessToken(bearerToken);
+    public List<StateEntity> getAllStates() throws AuthorizationFailedException {
+        //customerAdminBusinessService.validateAccessToken(bearerToken);
         return stateDao.getAllStates();
     }
 

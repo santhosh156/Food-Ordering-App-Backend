@@ -63,7 +63,7 @@ public class CategoryController {
         }
 
         // Getting category which matched with given category_id with help of category business service
-        final CategoryEntity category = categoryBusinessService.getCategoryEntityByUUId(category_id);
+        final CategoryEntity category = categoryBusinessService.getCategoryEntityByUuid(category_id);
 
         // Throw exception if given category_id not matched with any category in DB
         if(category == null){

@@ -31,9 +31,9 @@ public class RestaurantDao  {
         }
     }
 
-    public List<RestaurantCategoryEntity> getRestaurantByCategoryId(String categoryUUID) {
+    public List<RestaurantCategoryEntity> getRestaurantByCategoryId(final Long categoryID) {
         try {
-            return entityManager.createNamedQuery("findRestaurantByCategoryId", RestaurantCategoryEntity.class).setParameter("categoryUUID",categoryUUID.toLowerCase()).getResultList();
+            return entityManager.createNamedQuery("restaurantsByCategoryId", RestaurantCategoryEntity.class).setParameter("id",categoryID).getResultList();
         } catch(NoResultException nre) {
             return null;
         }

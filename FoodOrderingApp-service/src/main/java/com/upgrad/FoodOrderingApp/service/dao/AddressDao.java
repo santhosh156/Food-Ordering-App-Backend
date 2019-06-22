@@ -24,21 +24,33 @@ public class AddressDao {
 
     }
 
+    public AddressEntity getAddressByUuid(final String addressUuid) {
+        try {
+            return entityManager.createNamedQuery("addressByUuid", AddressEntity.class).setParameter("uuid", addressUuid)
+                    .getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
+
+    }
+
     public AddressEntity createAddress(AddressEntity addressEntity) {
         entityManager.persist(addressEntity);
         return addressEntity;
     }
 
-    public AddressEntity deleteAddressByUuid(final String uuid) {
-        try {
-            AddressEntity ae = entityManager.createNamedQuery("addressByUuid", AddressEntity.class).setParameter("uuid", uuid)
+    public AddressEntity deleteAddressByUuid(final AddressEntity addressEntity) {
+        entityManager.remove(addressEntity);
+        return addressEntity;
+        /*try {
+            AddressEntity ae = entityManager.createNamedQuery("deleteAddressByUuid", AddressEntity.class).setParameter("uuid", addressUuid)
                     .getSingleResult();
             ae.setActive(0);
             entityManager.persist(ae);
             return ae;
         } catch (NoResultException nre) {
             return null;
-        }
+        }*/
     }
 
 }

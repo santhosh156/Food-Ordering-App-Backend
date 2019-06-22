@@ -61,46 +61,74 @@ public class AddressController {
         return new ResponseEntity<SaveAddressResponse>(saveAddressResponse, HttpStatus.CREATED);
     }
 
+    // Get All Saved Addresses endpoint requests Bearer authorization of the customer
+    // and gets the addresses successfully.
     @RequestMapping(method = RequestMethod.GET, path = "/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AddressListResponse> getAllPermanentAddress(String authorization) throws AuthorizationFailedException {
+    public ResponseEntity<AddressListResponse> getAllPermanentAddress(@RequestHeader("authorization") String authorization)
+            throws AuthorizationFailedException {
 
-        // Authentication Token
+        // Splits the Bearer authorization text as Bearer and bearerToken
         String[] bearerToken = authorization.split("Bearer ");
 
+        // Calls the getAllAddress method by passing the bearer token
         List<AddressEntity> addressEntityList = addressService.getAllAddress(bearerToken[1]);
 
         AddressListResponse addressListResponse = new AddressListResponse();
+
+        // Loops thru the addressEntityList to get details
         for (AddressEntity ae : addressEntityList) {
+
+            // Calls the getStateById method by passing stateId
             StateEntity se = addressService.getStateById(ae.getState().getId());
 
             AddressListState addressListState = new AddressListState();
+
+            // Sets the state to each address element
             addressListState.setStateName(se.getStateName());
-            AddressList addressList = new AddressList().city(ae.getCity()).flatBuildingName(ae.getFlatBuildingNumber())
-                    .locality(ae.getLocality()).pincode(ae.getPincode()).state(addressListState);
+
+            // Adds the city, flat building name, locality, pincode and state to the addressList
+            AddressList addressList = new AddressList().id(UUID.fromString(ae.getUuid())).city(ae.getCity())
+                    .flatBuildingName(ae.getFlatBuildingNumber()).locality(ae.getLocality())
+                    .pincode(ae.getPincode()).state(addressListState);
+
+            // Adds the addressList to addressListResponse
             addressListResponse.addAddressesItem(addressList);
         }
 
+        // Returns the AddressListResponse with OK http status
         return new ResponseEntity<AddressListResponse>(addressListResponse, HttpStatus.OK);
     }
 
+    // Delete Saved Address endpoint requests Bearer authorization of the customer and Address UUID as path variable
+    // and deletes the address successfully.
     @RequestMapping(method = RequestMethod.DELETE, path = "/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<DeleteAddressResponse> deleteAddress(String authorization, @PathVariable("address_id") UUID addressId) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-        // Authentication Token
+    public ResponseEntity<DeleteAddressResponse> deleteAddress(String authorization,
+                                                               @PathVariable("address_id") String addressUuid)
+            throws AuthorizationFailedException, AddressNotFoundException {
+
+        // Splits the Bearer authorization text as Bearer and bearerToken
         String[] bearerToken = authorization.split("Bearer ");
 
-        addressService.deleteAddress(addressId, bearerToken[1]);
+        // Calls the deleteAddress with addressId and bearerToken as argument
+        AddressEntity deletedAddress = addressService.deleteAddress(addressUuid, bearerToken[1]);
 
-        DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse().id(addressId).status("ADDRESS DELETED SUCCESSFULLY");
-        return new ResponseEntity<>(deleteAddressResponse, HttpStatus.OK);
+        // Loads the DeleteAddressResponse with uuid of the address and the respective status message
+        DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse().id(UUID.fromString(deletedAddress.getUuid()))
+                .status("ADDRESS DELETED SUCCESSFULLY");
+
+        // Returns the DeleteAddressResponse with OK http status
+        return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
     }
 
+    // Get All States endpoint gets all the states successfully.
     @RequestMapping(method = RequestMethod.GET, path = "/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<StatesListResponse> getAllStates(String authorization) throws AuthorizationFailedException {
-        // Authentication Token
-        String[] bearerToken = authorization.split("Bearer ");
+    public ResponseEntity<StatesListResponse> getAllStates() throws AuthorizationFailedException {
 
-        List<StateEntity> stateEntityList = addressService.getAllStates(bearerToken[1]);
+        // Calls the getAllStates from addressService
+        List<StateEntity> stateEntityList = addressService.getAllStates();
         StatesListResponse stateListResponse = new StatesListResponse();
+
+        // Loops thru the stateEntityList to load the StatesListResponse
         for (StateEntity se : stateEntityList) {
             StatesList state = new StatesList();
             state.setStateName(se.getStateName());
@@ -108,6 +136,6 @@ public class AddressController {
             stateListResponse.addStatesItem(state);
         }
 
-        return new ResponseEntity<>(stateListResponse, HttpStatus.OK);
+        return new ResponseEntity<StatesListResponse>(stateListResponse, HttpStatus.OK);
     }
 }

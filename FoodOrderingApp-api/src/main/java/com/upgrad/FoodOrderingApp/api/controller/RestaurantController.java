@@ -32,11 +32,18 @@ public class RestaurantController {
     @Autowired
     private CustomerAdminBusinessService customerAdminBusinessService;
 
+    /**
+     *
+     * @return List of all restaurants in the database
+     *
+     */
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity getAllRestaurants() {
+    public ResponseEntity<RestaurantListResponse> getAllRestaurants() {
 
         // Getting the list of all restaurants with help of restaurant business service
         final List<RestaurantEntity> allRestaurants = restaurantBusinessService.getAllRestaurants();
+
+        RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
 
         // Adding the list of restaurants to RestaurantList
         List<RestaurantList> details = new ArrayList<RestaurantList>();
@@ -83,11 +90,12 @@ public class RestaurantController {
             detail.setCategories(String.join(",", categoryLists));
 
             // Add category detail to details(RestaurantList)
-            details.add(detail);
+            //details.add(detail);
+            restaurantListResponse.addRestaurantsItem(detail);
         }
 
         // return response entity with RestaurantLists(details) and Http status
-        return new ResponseEntity<>(details, HttpStatus.OK);
+        return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
     }
 
     /**
@@ -97,7 +105,8 @@ public class RestaurantController {
      * @throws RestaurantNotFoundException - when restaurant name field is empty
      */
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant/name/{restaurant_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity getRestaurantsByName(@PathVariable String restaurant_name) throws RestaurantNotFoundException {
+    public ResponseEntity<RestaurantListResponse> getRestaurantsByName(@PathVariable String restaurant_name)
+            throws RestaurantNotFoundException {
 
         // Throw exception if path variable(restaurant_name) is empty
         if(restaurant_name == null || restaurant_name.isEmpty() || restaurant_name.equalsIgnoreCase("\"\"")){
@@ -106,6 +115,8 @@ public class RestaurantController {
 
         // Getting the list of all restaurants with help of restaurant business service based on input restaurant name
         final List<RestaurantEntity> allRestaurants = restaurantBusinessService.getRestaurantsByName(restaurant_name);
+
+        RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
 
         // Adding the list of restaurants to RestaurantList
         List<RestaurantList> details = new ArrayList<RestaurantList>();
@@ -152,11 +163,14 @@ public class RestaurantController {
             detail.setCategories(String.join(",", categoryLists));
 
             // Add category detail to details(RestaurantList)
-            details.add(detail);
+            //details.add(detail);
+
+            restaurantListResponse.addRestaurantsItem(detail);
+
         }
 
         // return response entity with RestaurantLists(details) and Http status
-        return new ResponseEntity<>(details, HttpStatus.OK);
+        return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
     }
 
     /**
@@ -174,7 +188,7 @@ public class RestaurantController {
         }
 
         // Getting category which matched with given category_id with help of category business service
-        CategoryEntity matchedCategory = categoryBusinessService.getCategoryEntityByUUId(category_id);
+        CategoryEntity matchedCategory = categoryBusinessService.getCategoryEntityByUuid(category_id);
 
         // Throw exception if given category_id not matched with any category in DB
         if(matchedCategory == null){
@@ -182,7 +196,7 @@ public class RestaurantController {
         }
 
         // If given category_id match with any category in DB, then get all restaurants having matched category
-        final List<RestaurantCategoryEntity> allRestaurantCategories = restaurantBusinessService.getRestaurantByCategoryId(category_id);
+        final List<RestaurantCategoryEntity> allRestaurantCategories = restaurantBusinessService.getRestaurantByCategoryId(matchedCategory.getId());
 
         // Adding the list of restaurants to RestaurantList
         List<RestaurantList> details = new ArrayList<RestaurantList>();
@@ -319,9 +333,16 @@ public class RestaurantController {
         return new ResponseEntity<>(details, HttpStatus.OK);
     }
 
-
+    /**
+     *
+     * @param authorization, customerRating, restaurant_id
+     * @return Restaurant uuid of the rating updated restaurant
+     * @throws RestaurantNotFoundException - When given restaurant id field is empty
+     *         AuthorizationFailedException - When customer is not logged in or logged out or login expired
+     *         InvalidRatingException - When the Rating value provided is invalid
+     */
     @RequestMapping(method = RequestMethod.PUT, path = "/restaurant/{restaurant_id}",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity updateCustomerRating(@RequestHeader("authorization") final String authorization, @RequestParam Double customerRating, @PathVariable String restaurant_id )
+    public ResponseEntity<RestaurantUpdatedResponse> updateCustomerRating(@RequestHeader("authorization") final String authorization, @RequestParam Double customerRating, @PathVariable String restaurant_id )
             throws AuthorizationFailedException, InvalidRatingException, RestaurantNotFoundException {
 
         // Get the bearerToken

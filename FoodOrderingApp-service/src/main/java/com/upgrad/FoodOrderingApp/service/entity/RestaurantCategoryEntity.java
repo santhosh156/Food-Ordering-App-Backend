@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Table(name = "restaurant_category")
 @NamedQueries(
         {
-                @NamedQuery(name = "restaurantCategroryById", query = "select r from RestaurantCategoryEntity r where r.id=:id")
+                @NamedQuery(name = "restaurantsByCategoryId", query = "select r from RestaurantCategoryEntity r where r.id=:id")
         }
 )
 
