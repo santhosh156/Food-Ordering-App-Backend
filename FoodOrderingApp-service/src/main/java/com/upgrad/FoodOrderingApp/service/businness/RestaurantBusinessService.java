@@ -77,12 +77,13 @@ public class RestaurantBusinessService {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-
-        // Now set the updated password and attach it to the customerEntity
-        restaurantEntity.setCustomerRating(BigDecimal.valueOf(customerRating));
+        // Now calculate new customer rating  and set the updated rating and attach it to the restaurantEntity
+        BigDecimal oldRatingCalculation = (restaurantEntity.getCustomerRating().multiply(new BigDecimal(restaurantEntity.getNumCustomersRated())));
+        BigDecimal calculatedRating = (oldRatingCalculation.add(new BigDecimal(customerRating))).divide(new BigDecimal(restaurantEntity.getNumCustomersRated() + 1));
+        restaurantEntity.setCustomerRating(calculatedRating);
         restaurantEntity.setNumCustomersRated(restaurantEntity.getNumCustomersRated() + 1);
 
-        //called customerDao to merge the content and update in the database
+        //called restaurantDao to merge the content and update in the database
         restaurantDao.updateRestaurant(restaurantEntity);
         return restaurantEntity;
     }

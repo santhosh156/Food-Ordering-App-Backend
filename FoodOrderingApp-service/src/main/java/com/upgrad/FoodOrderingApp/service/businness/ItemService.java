@@ -54,44 +54,29 @@ public class ItemService {
         List<ItemEntity> itemEntityList = new ArrayList<>();
 
         // Gets all the orders placed in the restaurant
-        for (OrdersEntity orderEntity : orderDao.getOrdersByRestaurant(restaurantEntity.getId())) {
+        for (OrdersEntity orderEntity : orderDao.getOrdersByRestaurant(restaurantEntity)) {
             // Gets items from each order placed in the restaurant
             for (OrderItemEntity orderItemEntity : orderItemDao.getItemsByOrder(orderEntity)) {
                 itemEntityList.add(orderItemEntity.getItem());
             }
         }
 
-
-        // Maps each item with its respective order count
+        // Load all the item entities to hashmap
         Map<String, Integer> map = new HashMap<String, Integer>();
-        Stream<Map.Entry<String,Integer>> sorted =
-                map.entrySet().stream()
-                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()));
-
-        Map<String,Integer> topFive =
-                map.entrySet().stream()
-                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                        .limit(5)
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-        /*for (ItemEntity itemEntity : itemEntityList) {
+        for (ItemEntity itemEntity : itemEntityList) {
             Integer count = map.get(itemEntity.getUuid());
             map.put(itemEntity.getUuid(), (count == null) ? 1 : count + 1);
         }
 
-        // Sorts the items based on the number of times ordered
+        // Sorts item entities
         Map<String, Integer> treeMap = new TreeMap<String, Integer>(map);
         List<ItemEntity> sortedItemEntityList = new ArrayList<ItemEntity>();
         for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
             sortedItemEntityList.add(itemDao.getItemByUuid(entry.getKey()));
         }
-        //Collections.reverse(sortedItemEntityList);*/
 
-        List<ItemEntity> sortedItemEntityList = new ArrayList<ItemEntity>();
-        for (Map.Entry<String, Integer> entry : topFive.entrySet()) {
-            sortedItemEntityList.add(itemDao.getItemByUuid(entry.getKey()));
-        }
+        // Reverse sort the collections
+        Collections.reverse(sortedItemEntityList);
 
         return sortedItemEntityList;
     }

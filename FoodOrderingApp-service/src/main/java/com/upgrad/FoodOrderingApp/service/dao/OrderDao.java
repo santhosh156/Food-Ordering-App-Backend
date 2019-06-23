@@ -37,10 +37,10 @@ public class OrderDao {
         return ordersEntity;
     }
 
-    public List<OrdersEntity> getOrdersByRestaurant(final Long restaurantId) {
+    public List<OrdersEntity> getOrdersByRestaurant(final RestaurantEntity restaurantEntity) {
         try {
             return entityManager.createNamedQuery("ordersByRestaurant", OrdersEntity.class)
-                    .setParameter("restaurant", restaurantId).getResultList();
+                    .setParameter("restaurant", restaurantEntity).getResultList();
         } catch (NoResultException nre) {
             return null;
         }
