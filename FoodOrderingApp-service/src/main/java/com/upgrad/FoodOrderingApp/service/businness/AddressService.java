@@ -41,6 +41,12 @@ public class AddressService {
     }
 
     @Transactional
+    public AddressEntity getAddressByUuid(final String addressUuid) {
+        return addressDao.getAddressByUuid(addressUuid);
+    }
+
+
+    @Transactional
     public StateEntity getStateByUUID(String stateUuid) throws SaveAddressException, AddressNotFoundException{
         StateEntity stateEntity = stateDao.getStateByUuid(stateUuid);
         if(stateUuid.isEmpty()){

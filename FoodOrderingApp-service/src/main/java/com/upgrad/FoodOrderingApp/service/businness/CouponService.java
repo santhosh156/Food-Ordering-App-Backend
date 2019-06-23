@@ -20,7 +20,7 @@ public class CouponService {
     }
 
     @Transactional
-    public CouponEntity getCouponByUuid(final UUID couponUuid) {
+    public CouponEntity getCouponByUuid(final String couponUuid) {
         return couponDao.getCouponByUuid(couponUuid);
     }
 

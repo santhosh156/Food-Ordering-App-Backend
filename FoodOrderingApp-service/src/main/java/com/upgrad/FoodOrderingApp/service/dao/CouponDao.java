@@ -23,7 +23,7 @@ public class CouponDao {
         }
     }
 
-    public CouponEntity getCouponByUuid(UUID couponId) {
+    public CouponEntity getCouponByUuid(String couponId) {
         try {
             return entityManager.createNamedQuery("couponByUuid", CouponEntity.class).setParameter("uuid", couponId)
                     .getSingleResult();

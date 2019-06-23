@@ -7,6 +7,7 @@ import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.OrderItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.OrdersEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
+import com.upgrad.FoodOrderingApp.service.exception.ItemNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +37,14 @@ public class ItemService {
 
     @Transactional
     // A Method which takes the item uuid as parameter for getItemEntityByUuid
-    public ItemEntity getItemEntityById(final String itemUuid){
+    public ItemEntity getItemEntityByUuid(final String itemUuid) throws ItemNotFoundException{
 
-        return itemDao.getItemByUuid(itemUuid);
+        ItemEntity itemEntity = itemDao.getItemByUuid(itemUuid);
+        if (itemEntity == null) {
+            throw new ItemNotFoundException("INF-003", "No item by this id exist");
+        } else {
+            return itemEntity;
+        }
     }
 
     @Transactional
@@ -50,7 +56,7 @@ public class ItemService {
         // Gets all the orders placed in the restaurant
         for (OrdersEntity orderEntity : orderDao.getOrdersByRestaurant(restaurantEntity.getId())) {
             // Gets items from each order placed in the restaurant
-            for (OrderItemEntity orderItemEntity : orderItemDao.getItemsByOrder(orderEntity.getId())) {
+            for (OrderItemEntity orderItemEntity : orderItemDao.getItemsByOrder(orderEntity)) {
                 itemEntityList.add(orderItemEntity.getItem());
             }
         }
@@ -88,6 +94,10 @@ public class ItemService {
         }
 
         return sortedItemEntityList;
+    }
+
+    public List<OrderItemEntity> getItemsByOrder(OrdersEntity orderEntity) {
+        return orderItemDao.getItemsByOrder(orderEntity);
     }
 }
 
